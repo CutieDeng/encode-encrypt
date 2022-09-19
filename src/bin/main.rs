@@ -1,4 +1,4 @@
-use code_support::{base64, Encode};
+use encode_encrypt::{base64, Encode};
 
 fn main() {
     // println!("Hello, world!");

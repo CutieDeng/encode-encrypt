@@ -1,6 +1,6 @@
 use std::{env, fs::File, os::unix::prelude::FileExt};
 
-use code_support::sha1::{Sha1, Sha1ResultDisplay};
+use encode_encrypt::sha1::{Sha1, Sha1ResultDisplay};
 
 fn main() {
     let fname = env::args().skip(1).take(1).next().unwrap();

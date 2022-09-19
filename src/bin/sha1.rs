@@ -1,6 +1,6 @@
 use std::io::stdin;
 
-use code_support::sha1::{Sha1, Sha1ResultDisplay};
+use encode_encrypt::sha1::{Sha1, Sha1ResultDisplay};
 
 fn main() {
     let sha1 = Sha1::default(); 

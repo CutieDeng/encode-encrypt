@@ -1,6 +1,6 @@
 use std::{env, fs::File, os::unix::prelude::FileExt};
 
-use code_support::md5::Md5;
+use encode_encrypt::md5::Md5;
 
 fn main() {
     let fname = env::args().skip(1).next().unwrap(); 
