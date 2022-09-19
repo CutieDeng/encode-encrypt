@@ -1,4 +1,4 @@
-#![feature(never_type)]
+#![feature(never_type, const_trait_impl, exclusive_range_pattern)] 
 #![feature(array_chunks, core_intrinsics, 
     maybe_uninit_uninit_array)]
 
@@ -15,3 +15,5 @@ pub trait Encode {
 
 pub mod base64;
 pub mod sha1; 
+pub mod aes; 
+pub mod md5; 
