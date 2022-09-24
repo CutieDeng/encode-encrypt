@@ -57,16 +57,19 @@ fn generate_sarray() -> [u32; 64] {
         }; 
         i += 1;  
     }
+    assert ! (r.into_remainder().len() == 0); 
     result 
 }
 
 impl Md5 {
     pub fn clear(&mut self) {
-        self.0 = init_variables() 
+        *self = Self::new()
     }
 
     pub fn consume_block(&mut self, block: &[u8; 64]) {
         let words: &[u32; 16] = unsafe { transmute(block) }; 
+        // let mut words = [0u32; 16]; 
+        // LittleEndian::read_u32_into(block, &mut words); 
         let mut this = self.clone(); 
         for i in 0..64 {
             let f; 
@@ -90,9 +93,10 @@ impl Md5 {
                 }
                 _ => unreachable!(), 
             }
-            let f = f.wrapping_add(this.0[0])
-            .wrapping_add(K_ARRAY[i])
-            .wrapping_add(words[g]); 
+            let f = f
+                .wrapping_add(this.0[0])
+                .wrapping_add(K_ARRAY[i])
+                .wrapping_add(words[g]); 
             this.0[0] = this.0[3]; 
             this.0[3] = this.0[2]; 
             this.0[2] = this.0[1]; 
@@ -104,7 +108,7 @@ impl Md5 {
         self.1 += 1; 
     }
 
-    pub fn consume_last_block(&self, block: &[u8]) -> [u32; 4] {
+    pub fn consume_last_block(&self, block: &[u8]) -> Md5Result {
         let mut actual_block = [0u8; 64];
         assert! (block.len() < 64); 
         let content_length = (self.1 * 64 + block.len() as u64) * 8; 
@@ -115,14 +119,15 @@ impl Md5 {
         let mut this = self.clone(); 
         if block.len() >= 56 {
             this.consume_block(&actual_block); 
-            actual_block = [0u8; 64]; 
+            actual_block = [0; 64]; 
         }
         LittleEndian::write_u64(&mut actual_block[56..], content_length); 
         this.consume_block(&actual_block); 
-        this.0 
+        let ref result = this.0; 
+        Md5Result([result[0].swap_bytes(), result[1].swap_bytes(), result[2].swap_bytes(), result[3].swap_bytes()])
     }
 
-    pub fn consume_blocks(&self, blocks: &[u8]) -> [u32; 4] {
+    pub fn consume_blocks(&self, blocks: &[u8]) -> Md5Result {
         let mut block_arrays = blocks.array_chunks::<64>();
         let mut this = self.clone(); 
         while let Some (block) = block_arrays.next() {
@@ -132,16 +137,12 @@ impl Md5 {
     }
 }
 
-pub struct Md5ResultDisplay<'a> (pub &'a [u32; 4]); 
+#[derive(Clone)]
+pub struct Md5Result(pub [u32; 4]); 
 
-impl <'a> Display for Md5ResultDisplay<'a> {
+impl Display for Md5Result {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write! (f, "{:02x}{:02x}{:02x}{:02x}", self.0[0], self.0[1], self.0[2], self.0[3]) 
-    }
-}
-
-impl Md5 {
-    pub fn display(&self) -> Md5ResultDisplay {
-        Md5ResultDisplay(&self.0)
+        let ref value = self.0; 
+        write! (f, "{:08x}{:08x}{:08x}{:08x}", value[0], value[1], value[2], value[3]) 
     }
 }

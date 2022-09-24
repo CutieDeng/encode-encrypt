@@ -12,8 +12,7 @@ fn main() {
         let r = fstream.read_at(&mut buffer, offset).unwrap_or(0); 
         if r != 64 {
             let result = md5.consume_last_block(&buffer[..r]); 
-            md5.0 = result; 
-            println!("MD5 val: {}", md5.display()); 
+            println!("MD5 val: {}", result); 
             break 
         } 
         offset += r as u64; 

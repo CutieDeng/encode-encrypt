@@ -27,7 +27,7 @@ impl Sha1 {
     }
 
     pub fn clear(&mut self) {
-        self.0 = init_variables() 
+        *self = Self::new() 
     }
 
     pub fn hash_all(&self, values: &[u8]) -> [u32; 5] {
@@ -149,6 +149,7 @@ impl Sha1 {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Sha1ResultDisplay <'a> (pub &'a [u32; 5]); 
 
 impl <'a> Display for Sha1ResultDisplay <'a> {
